@@ -1,13 +1,13 @@
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package edu.uci.ics.crawler4j.parser;
+package edu.uci.ics.crawler4j.parser.html;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import edu.uci.ics.crawler4j.parser.ExtractedUrlAnchorPair;
+
 public class HtmlContentHandler extends DefaultHandler {
 
 	private enum Element {
@@ -33,6 +35,7 @@ public class HtmlContentHandler extends DefaultHandler {
 	}
 
 	private static class HtmlFactory {
+
 		private static Map<String, Element> name2Element;
 
 		static {
@@ -48,22 +51,69 @@ public class HtmlContentHandler extends DefaultHandler {
 	}
 
 	private String base;
+
 	private String metaRefresh;
+
 	private String metaLocation;
 
 	private boolean isWithinBodyElement;
+
 	private StringBuilder bodyText;
 
 	private List<ExtractedUrlAnchorPair> outgoingUrls;
 
 	private ExtractedUrlAnchorPair curUrl = null;
+
 	private boolean anchorFlag = false;
+
 	private StringBuilder anchorText = new StringBuilder();
 
 	public HtmlContentHandler() {
 		isWithinBodyElement = false;
 		bodyText = new StringBuilder();
 		outgoingUrls = new ArrayList<ExtractedUrlAnchorPair>();
+	}
+
+	@Override
+	public void characters(char ch[], int start, int length) throws SAXException {
+		if (isWithinBodyElement) {
+			bodyText.append(ch, start, length);
+
+			if (anchorFlag) {
+				anchorText.append(new String(ch, start, length).replaceAll("\n", "").replaceAll("\t", "").trim());
+			}
+		}
+	}
+
+	@Override
+	public void endElement(String uri, String localName, String qName) throws SAXException {
+		Element element = HtmlFactory.getElement(localName);
+		if (element == Element.A || element == Element.AREA || element == Element.LINK) {
+			anchorFlag = false;
+			if (curUrl != null) {
+				String anchor = anchorText.toString().trim();
+				if (!anchor.isEmpty()) {
+					curUrl.setAnchor(anchor);
+				}
+				anchorText.delete(0, anchorText.length());
+			}
+			curUrl = null;
+		}
+		if (element == Element.BODY) {
+			isWithinBodyElement = false;
+		}
+	}
+
+	public String getBaseUrl() {
+		return base;
+	}
+
+	public String getBodyText() {
+		return bodyText.toString();
+	}
+
+	public List<ExtractedUrlAnchorPair> getOutgoingUrls() {
+		return outgoingUrls;
 	}
 
 	@Override
@@ -137,48 +187,6 @@ public class HtmlContentHandler extends DefaultHandler {
 		if (element == Element.BODY) {
 			isWithinBodyElement = true;
 		}
-	}
-
-	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
-		Element element = HtmlFactory.getElement(localName);
-		if (element == Element.A || element == Element.AREA || element == Element.LINK) {
-			anchorFlag = false;
-			if (curUrl != null) {
-				String anchor = anchorText.toString().trim();
-				if (!anchor.isEmpty()) {
-					curUrl.setAnchor(anchor);
-				}
-				anchorText.delete(0, anchorText.length());
-			}
-			curUrl = null;
-		}
-		if (element == Element.BODY) {
-			isWithinBodyElement = false;
-		}
-	}
-
-	@Override
-	public void characters(char ch[], int start, int length) throws SAXException {
-		if (isWithinBodyElement) {
-			bodyText.append(ch, start, length);
-
-			if (anchorFlag) {
-				anchorText.append(new String(ch, start, length).replaceAll("\n", "").replaceAll("\t", "").trim());
-			}
-		}
-	}
-
-	public String getBodyText() {
-		return bodyText.toString();
-	}
-
-	public List<ExtractedUrlAnchorPair> getOutgoingUrls() {
-		return outgoingUrls;
-	}
-
-	public String getBaseUrl() {
-		return base;
 	}
 
 }

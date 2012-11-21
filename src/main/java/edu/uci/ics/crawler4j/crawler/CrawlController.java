@@ -22,6 +22,10 @@ import com.sleepycat.je.EnvironmentConfig;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.frontier.DocIDServer;
 import edu.uci.ics.crawler4j.frontier.Frontier;
+import edu.uci.ics.crawler4j.parser.ContentTypeRegistry;
+import edu.uci.ics.crawler4j.parser.binary.BinaryParseData;
+import edu.uci.ics.crawler4j.parser.html.HtmlParseData;
+import edu.uci.ics.crawler4j.parser.text.TextParseData;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 import edu.uci.ics.crawler4j.url.WebURL;
@@ -110,6 +114,10 @@ public class CrawlController extends Configurable {
 
 		finished = false;
 		shuttingDown = false;
+
+		ContentTypeRegistry.register(HtmlParseData.class);
+		ContentTypeRegistry.register(TextParseData.class);
+		ContentTypeRegistry.register(BinaryParseData.class);
 	}
 
 	/**

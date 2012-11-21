@@ -4,7 +4,7 @@
 	<artifactId>crawler4j</artifactId>
 	<packaging>jar</packaging>
 	<name>crawler4j</name>
-	<version>3.4.1-SNAPSHOT</version>
+	<version>3.4.1.1</version>
 	<description>Open Source Web Crawler for Java</description>
 	<url>http://code.google.com/p/crawler4j/</url>
 	<licenses>
@@ -15,14 +15,18 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:https://crawler4j.googlecode.com/git/</connection>
-		<developerConnection>scm:git:https://crawler4j.googlecode.com/git/</developerConnection>
-		<url>https://crawler4j.googlecode.com/git/</url>
+		<connection>scm:git:https://github.com/Markush2010/crawler4j.git</connection>
+		<developerConnection>scm:git:git@github.com:Markush2010/crawler4j.git</developerConnection>
+		<url>https://github.com/Markush2010/crawler4j</url>
 	</scm>
 	<developers>
 		<developer>
 			<name>Yasser Ganjisaffar</name>
 			<email>{lastname}@gmail.com</email>
+		</developer>
+		<developer>
+			<name>Markus Holtermann</name>
+			<email>info@{firstname}{lastname}.eu</email>
 		</developer>
 	</developers>
 	

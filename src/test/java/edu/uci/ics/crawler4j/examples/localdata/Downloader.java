@@ -1,13 +1,13 @@
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
+ * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,9 +23,9 @@ import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.fetcher.PageFetchResult;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
-import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.parser.ParseData;
 import edu.uci.ics.crawler4j.parser.Parser;
+import edu.uci.ics.crawler4j.parser.html.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
@@ -34,7 +34,14 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class Downloader {
 
+	public static void main(String[] args) {
+		Downloader downloader = new Downloader();
+		downloader.processUrl("http://en.wikipedia.org/wiki/Main_Page/");
+		downloader.processUrl("http://www.yahoo.com/");
+	}
+
 	private Parser parser;
+
 	private PageFetcher pageFetcher;
 
 	public Downloader() {
@@ -75,7 +82,7 @@ public class Downloader {
 				if (parseData instanceof HtmlParseData) {
 					HtmlParseData htmlParseData = (HtmlParseData) parseData;
 					System.out.println("Title: " + htmlParseData.getTitle());
-					System.out.println("Text length: " + htmlParseData.getText().length());
+					System.out.println("Text length: " + ((String) htmlParseData.getContent()).length());
 					System.out.println("Html length: " + htmlParseData.getHtml().length());
 				}
 			} else {
@@ -85,11 +92,5 @@ public class Downloader {
 			System.out.println("Couldn't fetch the content of the page.");
 		}
 		System.out.println("==============");
-	}
-
-	public static void main(String[] args) {
-		Downloader downloader = new Downloader();
-		downloader.processUrl("http://en.wikipedia.org/wiki/Main_Page/");
-		downloader.processUrl("http://www.yahoo.com/");
 	}
 }

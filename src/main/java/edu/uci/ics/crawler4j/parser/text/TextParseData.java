@@ -15,42 +15,43 @@
  * limitations under the License.
  */
 
-package edu.uci.ics.crawler4j.parser;
+package edu.uci.ics.crawler4j.parser.text;
 
-import edu.uci.ics.crawler4j.crawler.Configurable;
+import java.io.UnsupportedEncodingException;
+
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.Page;
+import edu.uci.ics.crawler4j.parser.ParseData;
 
-/**
- * @author Yasser Ganjisaffar <lastname at gmail dot com>
- */
-public class Parser extends Configurable {
+public class TextParseData implements ParseData {
 
-	public Parser(CrawlConfig config) {
-		super(config);
+	private String content;
+
+	@Override
+	public Object getContent() {
+		return content;
 	}
 
-	public boolean parse(Page page, String contextURL) {
-		Class<? extends ParseData> pdcls = ContentTypeRegistry.getHandler(page.getContentType());
-		ParseData pd;
-		if (pdcls == null) {
-			pdcls = ContentTypeRegistry.getHandler("BINARY");
-			if (!config.isIncludeBinaryContentInCrawling() || pdcls == null) {
-				return false;
-			}
-		}
+	@Override
+	public String[] getMimeTypes() {
+		return new String[] { "text/plain" };
+	}
+
+	@Override
+	public void parse(Page page, CrawlConfig config) {
 		try {
-			pd = pdcls.newInstance();
-			pd.parse(page, config);
-			return true;
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
+			content = new String(page.getContentData(), page.getContentCharset());
+		} catch (UnsupportedEncodingException e) {
+			content = "";
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return false;
+		page.setParseData(this);
+	}
+
+	@Override
+	public String toString() {
+		return content;
 	}
 
 }
