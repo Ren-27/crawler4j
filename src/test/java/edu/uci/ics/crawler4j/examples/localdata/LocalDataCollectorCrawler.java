@@ -37,29 +37,6 @@ public class LocalDataCollectorCrawler extends WebCrawler {
 		myCrawlStat = new CrawlStat();
 	}
 
-	public void dumpMyData() {
-		int myId = getMyId();
-		// This is just an example. Therefore I print on screen. You may
-		// probably want to write in a text file.
-		System.out.println("Crawler " + myId + "> Processed Pages: " + myCrawlStat.getTotalProcessedPages());
-		System.out.println("Crawler " + myId + "> Total Links Found: " + myCrawlStat.getTotalLinks());
-		System.out.println("Crawler " + myId + "> Total Text Size: " + myCrawlStat.getTotalTextSize());
-	}
-
-	// This function is called by controller to get the local data of this
-	// crawler when job is finished
-	@Override
-	public Object getMyLocalData() {
-		return myCrawlStat;
-	}
-
-	// This function is called by controller before finishing the job.
-	// You can put whatever stuff you need here.
-	@Override
-	public void onBeforeExit() {
-		dumpMyData();
-	}
-
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
@@ -78,11 +55,35 @@ public class LocalDataCollectorCrawler extends WebCrawler {
 			try {
 				myCrawlStat.incTotalTextSize(((String) parseData.getContent()).getBytes("UTF-8").length);
 			} catch (UnsupportedEncodingException ignored) {
+				// Do nothing
 			}
 		}
 		// We dump this crawler statistics after processing every 50 pages
 		if (myCrawlStat.getTotalProcessedPages() % 50 == 0) {
 			dumpMyData();
 		}
+	}
+
+	// This function is called by controller to get the local data of this
+	// crawler when job is finished
+	@Override
+	public Object getMyLocalData() {
+		return myCrawlStat;
+	}
+
+	// This function is called by controller before finishing the job.
+	// You can put whatever stuff you need here.
+	@Override
+	public void onBeforeExit() {
+		dumpMyData();
+	}
+
+	public void dumpMyData() {
+		int id = getMyId();
+		// This is just an example. Therefore I print on screen. You may
+		// probably want to write in a text file.
+		System.out.println("Crawler " + id + "> Processed Pages: " + myCrawlStat.getTotalProcessedPages());
+		System.out.println("Crawler " + id + "> Total Links Found: " + myCrawlStat.getTotalLinks());
+		System.out.println("Crawler " + id + "> Total Text Size: " + myCrawlStat.getTotalTextSize());
 	}
 }

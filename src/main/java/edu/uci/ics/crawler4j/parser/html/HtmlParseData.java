@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.tika.metadata.DublinCore;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -37,6 +38,8 @@ import edu.uci.ics.crawler4j.url.URLCanonicalizer;
 import edu.uci.ics.crawler4j.url.WebURL;
 
 public class HtmlParseData implements ParseData {
+
+	protected static final Logger logger = Logger.getLogger(HtmlParseData.class.getName());
 
 	private String html = "";
 
@@ -80,14 +83,16 @@ public class HtmlParseData implements ParseData {
 			inputStream = new ByteArrayInputStream(page.getContentData());
 			htmlParser.parse(inputStream, contentHandler, metadata, parseContext);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage() + ", while parsing: " + page.getWebURL().getURL());
+			return;
 		} finally {
 			try {
 				if (inputStream != null) {
 					inputStream.close();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getMessage() + ", while parsing: " + page.getWebURL().getURL());
+				return;
 			}
 		}
 
@@ -98,7 +103,7 @@ public class HtmlParseData implements ParseData {
 		content = contentHandler.getBodyText().trim();
 		title = metadata.get(DublinCore.TITLE);
 
-		outgoingUrls = new ArrayList<WebURL>();
+		outgoingUrls = new ArrayList<>();
 
 		String baseURL = contentHandler.getBaseUrl();
 		String contextURL;
@@ -119,7 +124,8 @@ public class HtmlParseData implements ParseData {
 			if (href.startsWith("http://")) {
 				hrefWithoutProtocol = href.substring(7);
 			}
-			if (!hrefWithoutProtocol.contains("javascript:") && !hrefWithoutProtocol.contains("@")) {
+			if (!hrefWithoutProtocol.contains("javascript:") && !hrefWithoutProtocol.contains("mailto:")
+					&& !hrefWithoutProtocol.contains("@")) {
 				String url = URLCanonicalizer.getCanonicalURL(href, contextURL);
 				if (url != null) {
 					WebURL webURL = new WebURL();
@@ -141,8 +147,8 @@ public class HtmlParseData implements ParseData {
 				html = new String(page.getContentData(), page.getContentCharset());
 			}
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		}
 		page.setParseData(this);
 	}

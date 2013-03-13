@@ -17,6 +17,8 @@
 
 package edu.uci.ics.crawler4j.parser;
 
+import org.apache.log4j.Logger;
+
 import edu.uci.ics.crawler4j.crawler.Configurable;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -25,6 +27,8 @@ import edu.uci.ics.crawler4j.crawler.Page;
  * @author Yasser Ganjisaffar <lastname at gmail dot com>
  */
 public class Parser extends Configurable {
+
+	protected static final Logger logger = Logger.getLogger(Parser.class.getName());
 
 	public Parser(CrawlConfig config) {
 		super(config);
