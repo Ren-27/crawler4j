@@ -42,19 +42,17 @@ import edu.uci.ics.crawler4j.url.WebURL;
  * 
  * @author Yasser Ganjisaffar <lastname at gmail dot com>
  */
-// FIXME should not be coupled to CrawlController - it's only used to obtain
-// execution parameters, that shouldn't change during Crawler's execution
-public class WebCrawler
+public abstract class AbstractCrawler
     implements
     Crawler
 {
 
-    protected static final Logger logger = Logger.getLogger( WebCrawler.class.getName() );
+    protected final Logger logger = Logger.getLogger( getClass() );
 
     /**
      * The id associated to the crawler thread running this instance
      */
-    private int myId;
+    private final int myId;
 
     /**
      * The controller instance that has created this crawler thread. This
@@ -72,31 +70,31 @@ public class WebCrawler
      * The parser that is used by this crawler instance to parse the content of
      * the fetched pages.
      */
-    private Parser parser;
+    private final Parser parser;
 
     /**
      * The fetcher that is used by this crawler instance to fetch the content of
      * pages from the web.
      */
-    private PageFetcher pageFetcher;
+    private final PageFetcher pageFetcher;
 
     /**
      * The RobotstxtServer instance that is used by this crawler instance to
      * determine whether the crawler is allowed to crawl the content of each
      * page.
      */
-    private RobotstxtServer robotstxtServer;
+    private final RobotstxtServer robotstxtServer;
 
     /**
      * The DocIDServer that is used by this crawler instance to map each URL to
      * a unique docid.
      */
-    private DocIDServer docIdServer;
+    private final DocIDServer docIdServer;
 
     /**
      * The Frontier object that manages the crawl queue.
      */
-    private Frontier frontier;
+    private final Frontier frontier;
 
     /**
      * Is the current crawler instance waiting for new URLs? This field is
@@ -106,16 +104,13 @@ public class WebCrawler
      */
     private boolean isWaitingForNewURLs;
 
-    private volatile boolean shutdown;
-
     /**
-     * Initializes the current instance of the crawler
+     * Constructor.
      * 
      * @param id the id of this crawler instance
      * @param crawlController the controller that manages this crawling session
      */
-    @Override
-    public void init(final int id, final CrawlController crawlController) {
+    public AbstractCrawler(final int id, final CrawlController crawlController) {
 	this.myId = id;
 	this.pageFetcher = crawlController.getPageFetcher();
 	this.robotstxtServer = crawlController.getRobotstxtServer();
@@ -123,7 +118,6 @@ public class WebCrawler
 	this.frontier = crawlController.getFrontier();
 	this.parser = new Parser( crawlController.getConfig() );
 	this.myController = crawlController;
-	this.isWaitingForNewURLs = false;
     }
 
     /**
@@ -234,7 +228,7 @@ public class WebCrawler
 			processPage( curURL );
 			frontier.setProcessed( curURL );
 		    }
-		    if ( shutdown ) {
+		    if ( myController.isShuttingDown() ) {
 			logger.info( "Exiting because of controller shutdown." );
 			return;
 		    }
@@ -258,12 +252,6 @@ public class WebCrawler
 	return true;
     }
 
-    // TODO check if this should be in the interface
-    // @Override
-    public void shutdown() {
-	this.shutdown = true;
-    }
-
     /**
      * Classes that extends WebCrawler can overwrite this function to process
      * the content of the fetched and parsed page.
@@ -282,7 +270,7 @@ public class WebCrawler
 	}
 	PageFetchResult fetchResult = null;
 	try {
-	    fetchResult = fetchPage( url );
+	    fetchResult = pageFetcher.fetchHeader( url );
 	    final int statusCode = fetchResult.getStatusCode();
 	    handlePageStatusCode( url, statusCode, CustomFetchStatus.getStatusDescription( statusCode ) );
 	    if ( statusCode != HttpStatus.SC_OK ) {
@@ -305,7 +293,7 @@ public class WebCrawler
 			webURL.setDepth( url.getDepth() );
 			webURL.setDocid( -1 );
 			webURL.setAnchor( url.getAnchor() );
-			if ( shouldVisit( webURL ) && robotstxtServer.allows( webURL ) ) {
+			if ( internalShouldVisit( webURL ) ) {
 			    webURL.setDocid( docIdServer.getNewDocID( movedToUrl ) );
 			    frontier.schedule( webURL );
 			}
@@ -358,7 +346,7 @@ public class WebCrawler
 			webURL.setDocid( -1 );
 			webURL.setDepth( (short) ( url.getDepth() + 1 ) );
 			if ( maxCrawlDepth == -1 || url.getDepth() < maxCrawlDepth ) {
-			    if ( shouldVisit( webURL ) && robotstxtServer.allows( webURL ) ) {
+			    if ( internalShouldVisit( webURL ) ) {
 				webURL.setDocid( docIdServer.getNewDocID( webURL.getURL() ) );
 				toSchedule.add( webURL );
 			    }
@@ -382,8 +370,8 @@ public class WebCrawler
 	}
     }
 
-    private PageFetchResult fetchPage(final WebURL curURL) {
-	return pageFetcher.fetchHeader( curURL );
+    private boolean internalShouldVisit(final WebURL webURL) {
+	return shouldVisit( webURL ) && robotstxtServer.allows( webURL );
     }
 
     @Override
