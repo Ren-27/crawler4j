@@ -20,7 +20,7 @@ package edu.uci.ics.crawler4j.frontier;
 import com.sleepycat.je.*;
 import edu.uci.ics.crawler4j.crawler.Configurable;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
-import edu.uci.ics.crawler4j.util.Util;
+import edu.uci.ics.crawler4j.util.ByteArrayUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class Counters extends Configurable {
 			while (result == OperationStatus.SUCCESS) {
 				if (value.getData().length > 0) {
 					String name = new String(key.getData());
-					long counterValue = Util.byteArray2Long(value.getData());
+					long counterValue = ByteArrayUtils.byteArray2Long(value.getData());
 					counterValues.put(name, new Long(counterValue));
 				}
 				result = cursor.getNext(key, value, null);
@@ -98,7 +98,7 @@ public class Counters extends Configurable {
 				if (statisticsDB != null) {
 					Transaction txn = env.beginTransaction(null, null);					
 					statisticsDB.put(txn, new DatabaseEntry(name.getBytes()),
-							new DatabaseEntry(Util.long2ByteArray(value)));
+							new DatabaseEntry(ByteArrayUtils.long2ByteArray(value)));
 					txn.commit();
 				}
 			} catch (Exception e) {

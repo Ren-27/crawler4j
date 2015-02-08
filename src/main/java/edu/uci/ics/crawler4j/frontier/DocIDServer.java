@@ -28,7 +28,7 @@ import com.sleepycat.je.OperationStatus;
 
 import edu.uci.ics.crawler4j.crawler.Configurable;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
-import edu.uci.ics.crawler4j.util.Util;
+import edu.uci.ics.crawler4j.util.ByteArrayUtils;
 
 /**
  * @author Yasser Ganjisaffar <lastname at gmail dot com>
@@ -83,7 +83,7 @@ public class DocIDServer extends Configurable
 		result = docIDsDB.get(null, key, value, null);
 
 		if (result == OperationStatus.SUCCESS && value.getData().length > 0) {
-		    return Util.byteArray2Int(value.getData());
+		    return ByteArrayUtils.byteArray2Int(value.getData());
 		}
 	    } catch (Exception e) {
 		e.printStackTrace();
@@ -103,7 +103,7 @@ public class DocIDServer extends Configurable
 		}
 
 		lastDocID++;
-		docIDsDB.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(Util.int2ByteArray(lastDocID)));
+		docIDsDB.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(ByteArrayUtils.int2ByteArray(lastDocID)));
 		return lastDocID;
 	    } catch (Exception e) {
 		e.printStackTrace();
@@ -127,7 +127,7 @@ public class DocIDServer extends Configurable
 		throw new Exception("Doc id: " + prevDocid + " is already assigned to URL: " + url);
 	    }
 
-	    docIDsDB.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(Util.int2ByteArray(docId)));
+	    docIDsDB.put(null, new DatabaseEntry(url.getBytes()), new DatabaseEntry(ByteArrayUtils.int2ByteArray(docId)));
 	    lastDocID = docId;
 	}
     }

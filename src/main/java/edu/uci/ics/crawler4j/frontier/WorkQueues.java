@@ -30,7 +30,7 @@ import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.Transaction;
 
 import edu.uci.ics.crawler4j.url.WebURL;
-import edu.uci.ics.crawler4j.util.Util;
+import edu.uci.ics.crawler4j.util.ByteArrayUtils;
 
 /**
  * @author Yasser Ganjisaffar <lastname at gmail dot com>
@@ -157,7 +157,7 @@ public class WorkQueues
 	byte[] keyData = new byte[6];
 	keyData[0] = url.getPriority();
 	keyData[1] = (url.getDepth() > Byte.MAX_VALUE ? Byte.MAX_VALUE : (byte) url.getDepth());
-	Util.putIntInByteArray(url.getDocid(), keyData, 2);
+	ByteArrayUtils.putIntInByteArray(url.getDocid(), keyData, 2);
 	return new DatabaseEntry(keyData);
     }
 
