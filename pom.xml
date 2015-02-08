@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.uci.ics</groupId>
-	<artifactId>crawler4j</artifactId>
+	<artifactId>crawler4j-ren27</artifactId>
 	<packaging>jar</packaging>
 	<name>crawler4j</name>
 	<version>3.5.0.1</version>
@@ -15,9 +15,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:git:https://github.com/Markush2010/crawler4j.git</connection>
-		<developerConnection>scm:git:git@github.com:Markush2010/crawler4j.git</developerConnection>
-		<url>https://github.com/Markush2010/crawler4j</url>
+		<connection>scm:git:https://github.com/Ren-27/crawler4j.git</connection>
+		<developerConnection>scm:git:git@github.com:Ren-27/crawler4j.git</developerConnection>
+		<url>https://github.com/Ren-27/crawler4j</url>
 	</scm>
 	<developers>
 		<developer>
@@ -30,12 +30,6 @@
 		</developer>
 	</developers>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -46,16 +40,6 @@
 					<target>1.7</target>
 				</configuration>
 				<version>2.3.2</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<excludes>
-						<exclude>**/*.properties</exclude>
-					</excludes>
-				</configuration>
 			</plugin>
 			<!-- generate a source jar -->
 			<plugin>
@@ -162,6 +146,11 @@
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+    	    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>17.0</version>
 		</dependency>
 	</dependencies>
 
